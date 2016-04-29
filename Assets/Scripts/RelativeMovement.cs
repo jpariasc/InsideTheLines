@@ -6,12 +6,14 @@ public class RelativeMovement : MonoBehaviour {
 
     [SerializeField] private Transform target;
     private CharacterController _charController;
+    private Animator _animator;
 
     public float rotSpeed = 15.0f;
-    public float movSpeed = 6.0f;
+    public float movSpeed = 1.0f;
 
     void Start () {
         _charController = GetComponent<CharacterController> ();
+        _animator = GetComponent<Animator> ();
     }
 
     void Update() {
@@ -19,6 +21,10 @@ public class RelativeMovement : MonoBehaviour {
         float horInput = Input.GetAxis ("Horizontal");
         float vertInput = Input.GetAxis ("Vertical");
         if (horInput != 0 || vertInput != 0) {
+            if (Input.GetKeyDown (KeyCode.E)) {
+                movSpeed = 3.0f;
+            } else if (Input.GetKeyUp (KeyCode.E)) { movSpeed = 1.0f; }
+            _animator.SetFloat("Speed", movSpeed);
             movement.x = horInput * movSpeed;
             movement.z = vertInput * movSpeed;
             movement = Vector3.ClampMagnitude (movement, movSpeed);
@@ -28,6 +34,8 @@ public class RelativeMovement : MonoBehaviour {
             target.rotation = tmp;
             Quaternion direction = Quaternion.LookRotation (movement);
             transform.rotation = Quaternion.Lerp (transform.rotation, direction, rotSpeed * Time.deltaTime);
+        } else {
+            _animator.SetFloat ("Speed", 0.0f);
         }
         movement *= Time.deltaTime;
         _charController.Move (movement);
